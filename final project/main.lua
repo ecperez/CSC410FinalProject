@@ -131,6 +131,10 @@ sq:spawn();
 sq:move();
 --sq:shoot(500);
 
+local sq2 = Square:new({xPos=150, yPos=250});
+sq2:spawn();
+sq2:move();
+
 local tr = Triangle:new({xPos=25, yPos=300});
 tr:spawn();
 tr:move();
