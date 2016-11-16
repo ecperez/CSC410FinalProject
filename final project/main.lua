@@ -1,14 +1,18 @@
 local physics = require("physics");
 physics.start();
-physics.setDrawMode("hybrid");
+--physics.setDrawMode("hybrid");
 physics.setGravity(0,0);
 
+local ImageSheet = require("ImageSheet");
 local Enemy = require ("Enemy");
 local soundTable=require("soundTable");
 local Square = require ("Square");
 local Triangle = require ("Triangle");
 local CollisionFilters = require("CollisionFilters");
 --- Arena
+
+--create background image
+local bg = display.newImage("temp_background.jpg",display.contentCenterX, display.contentCenterY);
 
 local top = display.newRect(0,-30,display.contentWidth, 20);
 local bottom = display.newRect(0,display.contentHeight-30, 
@@ -27,9 +31,12 @@ controlBar:setFillColor(1,1,1,0.5);
 
 ---- Main Player
 
-local cube = display.newCircle (display.contentCenterX, display.contentHeight-150, 25);
+local cube = display.newSprite(gameSheet,sequenceData); --or display.newCircle(display.contentCenterX,display.contentHeight-150,20);
+cube.x = display.contentCenterX;
+cube.y = display.contentHeight-150;
+cube:setSequence("Player Type 1 Blue");
 
-physics.addBody (cube, "kinematic", {filter=CollisionFilters.player});
+physics.addBody(cube, "kinematic", {filter=CollisionFilters.player});
 
 local function move ( event )
 	 if event.phase == "began" then		
@@ -48,7 +55,7 @@ local function move ( event )
 	 end
 end
 
-controlBar:addEventListener("touch", move);
+Runtime:addEventListener("touch", move);
 
 
 -- Projectile 
@@ -57,11 +64,13 @@ local function fire (event)
   if (cnt < 3) then
     cnt = cnt+1;
 
-	local p = display.newCircle (cube.x, cube.y-30, 5);
+	local p = display.newSprite(gameSheet,sequenceData);
+	p.x = cube.x;
+	p.y = cube.y;
 	p.anchorY = 1;
-	p:setFillColor(0,1,0);
-	physics.addBody (p, "dynamic", {radius=5, filter=CollisionFilters.bullet} );
-	p:applyForce(0, -2, p.x, p.y);
+	p:setSequence("Laser Type 1 Blue");
+	physics.addBody (p, "dynamic", {filter=CollisionFilters.bullet});
+	p:applyForce(0, -7, p.x, p.y);
 
 	audio.play( soundTable["shootSound"] );
 	
@@ -83,7 +92,7 @@ local function fire (event)
   end
 end
 
-controlBar:addEventListener("tap", fire)
+Runtime:addEventListener("tap", fire)
 
 local function onBottomCollision(event)
 
