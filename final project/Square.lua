@@ -1,16 +1,17 @@
 local Enemy = require ("Enemy");
 local CollisionFilters = require("CollisionFilters");
+local ImageSheet = require("ImageSheet");
 
-local Square = Enemy:new( {HP=2, fR=720, fT=700, 
-				  bT=700} );
+local Square = Enemy:new( {HP=2, fR=720, fT=700, bT=700} );
 
 function Square:spawn()
-  self.shape = display.newRect (self.xPos, 
-    	 	 			  self.yPos, 30, 30); 
+  self.shape = display.newSprite(gameSheet, sequenceData);
+  self.shape.x = self.xPos;
+  self.shape.y = self.yPos;
+  self.shape:setSequence("Enemy Type 3 Green");
   self.shape.pp = self;
   self.shape.tag = "enemy";
-  self.shape:setFillColor ( 0, 1, 1);
-   physics.addBody(self.shape, "kinematic", {filter=CollisionFilters.enemy}); 
+  physics.addBody(self.shape, "kinematic", {filter=CollisionFilters.enemy}); 
 end
 
 function Square:back ()   
