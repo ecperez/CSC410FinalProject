@@ -1,19 +1,18 @@
 local Enemy = require ("Enemy");
 local CollisionFilters = require("CollisionFilters");
+local ImageSheet = require("ImageSheet");
 
 
-local Triangle = Enemy:new( {HP=3, bR=360, fT=500, 
-				     bT=300});
+local Triangle = Enemy:new( {HP=3, bR=360, fT=500, bT=300});
 
 function Triangle:spawn()
- self.shape = display.newPolygon(self.xPos, self.yPos, 
-			             {-15,-15,15,-15,0,15});
-  
- self.shape.pp = self;
- self.shape.tag = "enemy";
- self.shape:setFillColor ( 1, 0, 1);
- physics.addBody(self.shape, "kinematic", 
-		     {shape={-15,-15,15,-15,0,15}, filter=CollisionFilters.enemy}); 
+  self.shape = display.newSprite(gameSheet, sequenceData);
+  self.shape.x = self.xPos;
+  self.shape.y = self.yPos;
+  self.shape:setSequence("Enemy Type 2 Black");
+  self.shape.pp = self;
+  self.shape.tag = "enemy";
+  physics.addBody(self.shape, "kinematic", {filter=CollisionFilters.enemy}); 
 end
 
 function Triangle:back ()	
