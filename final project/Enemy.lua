@@ -1,10 +1,8 @@
 local soundTable=require("soundTable");
 local CollisionFilters = require("CollisionFilters");
+local ImageSheet = require("ImageSheet");
 
-local Enemy = {tag="enemy", HP=1, xPos=0, yPos=0, 
-    fR=0, sR=0, bR=0, fT=1000, sT=500, bT	=500};
-
-
+local Enemy = {tag="enemy", HP=1, xPos=0, yPos=0, fR=0, sR=0, bR=0, fT=1000, sT=500, bT	=500};
 
 function Enemy:new (o)    --constructor
   o = o or {}; 
@@ -14,10 +12,12 @@ function Enemy:new (o)    --constructor
 end
 
 function Enemy:spawn()
- self.shape = display.newCircle(self.xPos, self.yPos,15);
+ self.shape = display.newSprite(gameSheet, sequenceData);
+ self.shape.x = self.xPos;
+ self.shape.y = self.yPos;
+ self.shape:setSequence("Enemy Type 1 Orange");
  self.shape.pp = self;      -- parent object
  self.shape.tag = self.tag; -- “enemy”
- self.shape:setFillColor (1,1,0);
  physics.addBody(self.shape, "kinematic", {filter=CollisionFilters.enemy}); 
 end
 
