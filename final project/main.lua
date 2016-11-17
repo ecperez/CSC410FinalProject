@@ -53,6 +53,11 @@ local function exitSteps()
 	godBtn = nil;
 	defBtn:removeSelf();
 	defBtn = nil;
+	
+	audio.stop( backgroundMusicChannel )
+	backgroundMusicChannel = nil
+	audio.dispose(backgroundMusic);
+	backgroundMusic = nil;
 end
 				
 local function start (event)
@@ -77,40 +82,46 @@ end
 
 startBtn = widget.newButton(
 	{
-		shape = "circle",
-		radius = 150,
-		left = display.contentWidth/5,
-		top = display.contentHeight/3 * 2,
+		width = 350,
+        height = 291,
+		defaultFile = "meteorGrey_big3.png",
 		id = "startBtn",
 		label = "Start",
+		labelColor = { default={ 1, 1, 1 }},
 		fontSize = 75,
 		onEvent = start
 	}
 )
+startBtn.x = display.contentCenterX*.5
+startBtn.y = display.contentCenterY*1.48
 
 godBtn = widget.newButton(
 	{
-		shape = "circle",
-		radius = 150,
-		left = display.contentWidth/1.5,
-		top = display.contentHeight/1.55,
+		width = 350,
+        height = 291,
+		defaultFile = "meteorBrown_big1.png",
 		id = "godMode",
 		label = "Kim\nMode",
-		labelAlign = center,
+		labelColor = { default={ 1, 1, 1 }},
 		fontSize = 75,
-		onEvent = godMode	
+		onEvent = godMode,
+		
 	}
 )
+godBtn.x = display.contentCenterX*1.5
+godBtn.y = display.contentCenterY*1.5
 
 defBtn = widget.newButton(
 	{
-		shape = "circle",
-		radius = 170,
-		left = display.contentWidth/2.7,
-		top = display.contentHeight/1.2,
+		width = 365,
+        height = 304,
+		defaultFile = "meteorGreen_big3.png",
 		id = "def",
 		label = "Defences",
+		labelColor = { default={ 1, 1, 1 }},
 		fontSize = 75,
 		onEvent = defence
 	}
 )
+defBtn.x = display.contentCenterX
+defBtn.y = display.contentCenterY*1.7
