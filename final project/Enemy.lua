@@ -2,7 +2,10 @@ local soundTable=require("soundTable");
 local CollisionFilters = require("CollisionFilters");
 local ImageSheet = require("ImageSheet");
 
-local Enemy = {tag="enemy", HP=1, xPos=0, yPos=0, fR=0, sR=0, bR=0, fT=1000, sT=500, bT	=500};
+local Enemy = {tag="enemy", HP=1, xPos=display.contentWidth/2, yPos=0, 
+    fR=0, sR=0, bR=0, fT=200, sT=500, bT	=500,  timerR};
+
+
 
 function Enemy:new (o)    --constructor
   o = o or {}; 
@@ -15,29 +18,35 @@ function Enemy:spawn()
  self.shape = display.newSprite(gameSheet, sequenceData);
  self.shape.x = self.xPos;
  self.shape.y = self.yPos;
- self.shape:setSequence("Enemy Type 1 Orange");
  self.shape.pp = self;      -- parent object
  self.shape.tag = self.tag; -- “enemy”
- physics.addBody(self.shape, "kinematic", {filter=CollisionFilters.enemy}); 
+ self.shape:setSequence("Enemy Type 1 Orange");
+ physics.addBody(self.shape, "dynamic", {filter=CollisionFilters.enemy}); 
 end
 
 
 function Enemy:back ()
-  transition.to(self.shape, {x=self.shape.x+100, y=150,  
-  time=self.fB, rotation=self.bR, 
+  transition.to(self.shape, {x= display.contentWidth/2, y=self.shape.y - 75,  
+  time=self.fB,
   onComplete=function (obj) self:forward() end} );
 end
 
-function Enemy:side ()   
+function Enemy:left ()   
    transition.to(self.shape, {x=self.shape.x-200, 
-   time=self.fS, rotation=self.sR, 
+   time=self.fS,
+   onComplete=function (obj) self:right() end } );
+end
+
+function Enemy:right ()   
+   transition.to(self.shape, {x=self.shape.x+400, 
+   time=self.fS, 
    onComplete=function (obj) self:back() end } );
 end
 
 function Enemy:forward ()   
-   transition.to(self.shape, {x=self.shape.x+100, y=800, 
-   time=self.fT, rotation=self.fR, 
-   onComplete= function (obj) self:side() end } );
+   transition.to(self.shape, {x=self.shape.x, y=self.shape.y + 350, 
+   time=self.fT,
+   onComplete= function (obj) self:left() end } );
 end
 
 function Enemy:move ()	
@@ -68,24 +77,26 @@ end
 function Enemy:shoot (interval)
   interval = interval or 1500;
   local function createShot(obj)
-    local p = display.newRect (obj.shape.x, obj.shape.y+50, 
-                               10,10);
-    p:setFillColor(1,0,0);
+    local p = display.newSprite(gameSheet, sequenceData);
+    p.x = obj.shape.x;
+    p.y = obj.shape.y+50;
     p.anchorY=0;
-    physics.addBody (p, "dynamic", {filter=CollisionFilters.enemyBullet});
-    p:applyForce(0, 1, p.x, p.y);
+    p:setSequence("Laser Type 1 Red");
+    physics.addBody(p, "dynamic", {filter=CollisionFilters.enemyBullet});
+    p:applyForce(0, 15, p.x, p.y);
 		p.tag = "shot";
 
     local function shotHandler (event)
       if (event.phase == "began") then
-	  event.target:removeSelf();
-   	  event.target = nil;
+	      event.target:removeSelf();
+   	    event.target = nil;
       end
     end
     p:addEventListener("collision", shotHandler);		
   end
   self.timerRef = timer.performWithDelay(interval, 
 	function (event) createShot(self) end, -1);
+  self.timerR = timerRef;
 end
 
 return Enemy;

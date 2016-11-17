@@ -58,7 +58,9 @@ sheetOpt =
 		{x = 777, y = 679, width = 34, height = 33}, --Shield Power-Up
 		---Lasers---Frames 49 to 50
 		{x = 835, y = 566, width = 13, height = 36}, --blue laser
-		{x = 843, y = 941, width = 13, height = 36} --red laser
+		{x = 843, y = 941, width = 13, height = 36}, --red laser
+		---Bombs---Frame 51
+		{x = 580, y = 661, width = 48, height = 46}--red bomb
 	}
 }
 
@@ -101,14 +103,16 @@ sequenceData = {
 	{ name = "Turret Type 1 Blue", start=42, count=1, time=0, loopCount=1 },
 	{ name = "Turret Type 1 Green", start=43, count=1, time=0, loopCount=1 },
 	{ name = "Turret Type 1 Red", start=44, count=1, time=0, loopCount=1 },
-	{ name = "Turret Type 1 yellow", start=45, count=1, time=0, loopCount=1 },
+	{ name = "Turret Type 1 Yellow", start=45, count=1, time=0, loopCount=1 },
 	---Power-Up Sequence---
 	{ name = "Power-Up Energy", start=1, count=1, time=0, loopCount=1 },
 	{ name = "Power-Up Star", start=2, count=1, time=0, loopCount=1 },
 	{ name = "Power-Up Shield", start=3, count=1, time=0, loopCount=1 },
 	---Laser Sequence---
 	{ name = "Laser Type 1 Blue", start=49, count=1, time=0, loopCount=1 },
-	{ name = "Laser Type 1 Red", start=50, count=1, time=0, loopCount=1 }
+	{ name = "Laser Type 1 Red", start=50, count=1, time=0, loopCount=1 },
+	---Bomb Sequence---
+	{ name = "Bomb Type 1 Red", start=51, count=1, time=0, loopCount=1 }
 }
 
 --define the sprite sheet
