@@ -24,8 +24,9 @@ local scoreText;
 
 --Function
 local towerPurchase;
-local towerOption2 = {};
+local roundEnd;
 
+local towerOption2 = {};
 local towerPlacement1 = {};
 local towerPlacement2 = {};
 local towerPlacement3 = {};
@@ -40,7 +41,7 @@ towerPlacement4.contains = 0;
 local itemSelected = 0;
 local round = 1;
 data.enemyCount = round;
-print(data.enemyCount)
+local endCheck;
 
 --Buttons
 
@@ -245,6 +246,12 @@ local function roundStart()
 			enemyI = enemyI + 1;
 
 	end, round);
+	endCheck = timer.performWithDelay(10,
+		function()
+			if(data.enemyCount == 0)then
+				roundEnd();
+			end
+		end, -1);
 end
 
 local function towerCreate(event)
@@ -557,7 +564,7 @@ local function towerPage()
 	towerOptionbtn2:addEventListener("tap",gTowerPurchase);
 end
 
-local function roundEnd()
+function roundEnd()
 
 	if(towerPlacement1.contains == 1)then
 		timer.pause(towerPlacement1.shape.timerRef);
@@ -571,6 +578,8 @@ local function roundEnd()
 	if(towerPlacement4.contains == 1)then
 		timer.pause(towerPlacement4.shape.timerRef);
 	end
+
+		timer.pause(endCheck);
 	round = round + 1;
 	print("round ended")
 
