@@ -554,6 +554,18 @@ end
 
 local function roundEnd()
 
+	if(towerPlacement1.contains == 1)
+		--towerPlacement1.timer
+	end
+	if(towerPlacement2.contains == 1)
+		
+	end
+	if(towerPlacement3.contains == 1)
+		
+	end
+	if(towerPlacement4.contains == 1)
+		
+	end
 	round = round + 1;
 	print("round ended")
 
