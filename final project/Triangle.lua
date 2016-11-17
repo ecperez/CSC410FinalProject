@@ -3,35 +3,34 @@ local CollisionFilters = require("CollisionFilters");
 
 
 local Triangle = Enemy:new( {HP=3, bR=360, fT=500, 
-				     bT=300});
+				     bT=150});
 
 function Triangle:spawn()
  self.shape = display.newPolygon(self.xPos, self.yPos, 
-			             {-15,-15,15,-15,0,15});
+			             {-25,-25,25,-25,0,25});
   
  self.shape.pp = self;
  self.shape.tag = "enemy";
  self.shape:setFillColor ( 1, 0, 1);
- physics.addBody(self.shape, "kinematic", 
-		     {shape={-15,-15,15,-15,0,15}, filter=CollisionFilters.enemy}); 
+ physics.addBody(self.shape, "dynamic", 
+		     {shape={-25,-25,25,-25,0,25}, filter=CollisionFilters.enemy}); 
 end
 
 function Triangle:back ()	
-  transition.to(self.shape, {x=self.shape.x-600, 
+  transition.to(self.shape, {x=self.shape.x-130, 
     y=self.shape.y, time=self.bT, rotation=self.bR, 
     onComplete= function (obj) self:forward() end } );
 end
 
 function Triangle:side ()	
-   transition.to(self.shape, {x=self.shape.x + 400, 
+   transition.to(self.shape, {x=self.shape.x + 130, 
       time=self.sT, rotation=self.sR, 
       onComplete= function (obj) self:back () end });	
 end
 
 function Triangle:forward ()	
-  self.dist = math.random (40,70) * 10;
-  transition.to(self.shape, {x=self.shape.x+200,  
-    y=self.shape.y+self.dist, time=self.fT, rotation=self.fR, 
+  transition.to(self.shape, {x=self.shape.x+120,  
+    y=self.shape.y+200, time=self.fT, rotation=self.fR, 
     onComplete= function (obj) self:side() end } );
 end
 

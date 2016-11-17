@@ -3,21 +3,155 @@ physics.start();
 physics.setDrawMode("hybrid");
 physics.setGravity(0,0);
 
+local widget = require("widget");
 local Enemy = require ("Enemy");
+local tower = require ("tower");
 local soundTable=require("soundTable");
 local Square = require ("Square");
 local Triangle = require ("Triangle");
 local CollisionFilters = require("CollisionFilters");
---- Arena
+local scoreText;
+local instructionText;
 
-local top = display.newRect(0,-30,display.contentWidth, 20);
-local bottom = display.newRect(0,display.contentHeight-30, 
-				display.contentWidth*100, 20);
+-- Menu
+local Menu;
+local nextRound;
+local towerTab;
+local itemTab;
+
+
+local towerOption2 = {};
+
+local towerPlacement1 = {};
+local towerPlacement2 = {};
+local towerPlacement3 = {};
+local towerPlacement4 = {};
+
+towerPlacement1.contains = 0;
+towerPlacement2.contains = 0;
+towerPlacement3.contains = 0;
+towerPlacement4.contains = 0;
+-- game variables
+
+local round = 1;
+local enemyTotal = round;
+local gold = 100;
+
+--Buttons
+
+local towerOptionbtn1 = widget.newButton(
+{
+	x = display.contentWidth/4.8,
+	y = display.contentHeight/2.8,
+	id = "option1",
+	--optionNum = 1,
+	label = "Damage Tower",
+	onEvent = towerPurchase,
+	emboss = false,
+	shape = "roundedRect",
+	width = display.contentWidth/10,
+	height = display.contentHeight/16,
+	cornerRadius = 2,
+	fillColor = { default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+towerOptionbtn1.isVisible = false;
+local towerOptionbtn2 = widget.newButton(
+{
+	x = display.contentWidth/4.8,
+	y = display.contentHeight/1.8,
+	id = "option2",
+	--optionNum = 2,
+	label = "Gold Tower",
+	onEvent = towerPurchase,
+	emboss = false,
+	shape = "roundedRect",
+	width = display.contentWidth/10,
+	height = display.contentHeight/16,
+	cornerRadius = 2,
+	fillColor = { default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+towerOptionbtn2.isVisible = false;
+local towerPlacementbtn1 = widget.newButton(
+{
+	x = display.contentWidth/6,
+	y = display.contentHeight/1.2,
+	id = "towerBtn1",
+	--optionNum = 2,
+	label = " ",
+	onEvent = towerCreate,
+	emboss = false,
+	shape = "circle",
+	radius = display.contentWidth/14,
+	fillColor = { default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+towerPlacementbtn1.isVisible = false;
+
+local towerPlacementbtn2 = widget.newButton(
+{
+	x = display.contentWidth/3.4,
+	y = display.contentHeight/1.3,
+	id = "towerBtn2",
+	--optionNum = 2,
+	label = " ",
+	onEvent = towerCreate,
+	emboss = false,
+	shape = "circle",
+	radius = display.contentWidth/14,
+	fillColor = { default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+towerPlacementbtn2.isVisible = false;
+
+local towerPlacementbtn3 = widget.newButton(
+{
+	x = display.contentWidth/1.4,
+	y = display.contentHeight/1.3,
+	id = "towerBtn3",
+	--optionNum = 2,
+	label = " ",
+	onEvent = towerCreate,
+	emboss = false,
+	shape = "circle",
+	radius = display.contentWidth/14,
+	fillColor = { default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+towerPlacementbtn3.isVisible = false;
+
+local towerPlacementbtn4 = widget.newButton(
+{
+	x = display.contentWidth/1.15,
+	y = display.contentHeight/1.2,
+	id = "towerBtn4",
+	--optionNum = 2,
+	label = " ",
+	onEvent = towerCreate,
+	emboss = false,
+	shape = "circle",
+	radius = display.contentWidth/14,
+	fillColor = { default={1,0,0,1}, over={1,0.1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+towerPlacementbtn4.isVisible = false;
+-- Arena
+
+local top = display.newRect(0,-21,display.contentWidth, 20);
+local bottom = display.newRect(0,display.contentHeight+1, 
+				display.contentWidth*100, 500);
 bottom.tag = "bottom";
 top.anchorX = 0;top.anchorY = 0;
 bottom.anchorX = 0;bottom.anchorY = 0;
 
-physics.addBody( bottom, "static", {filter=CollisionFilters.walls});
+physics.addBody( bottom, "kinematic", {filter=CollisionFilters.walls});
 physics.addBody( top, "static", {filter=CollisionFilters.walls});
 
 
@@ -28,6 +162,9 @@ controlBar:setFillColor(1,1,1,0.5);
 ---- Main Player
 
 local cube = display.newCircle (display.contentCenterX, display.contentHeight-150, 25);
+cube.hp = 10;
+
+local baseHP = 20;
 
 physics.addBody (cube, "kinematic", {filter=CollisionFilters.player});
 
@@ -50,18 +187,175 @@ end
 
 controlBar:addEventListener("touch", move);
 
+local function roundStart()
+
+	if(round ~= 1)then
+		Menu:removeSelf();
+        Menu=nil;
+
+        nextRound:removeSelf();
+        nextRound=nil;
+
+        enemyTotal = round;
+	end
+
+	local currentEnemy = {};
+	local enemyI = 1;
+	print("Round Began")
+
+	local roundTimer = timer.performWithDelay(2500, 
+		function ()
+			local spawnTable = {};
+
+			spawnTable[1] = Enemy:new({xPos=500, yPos=300});
+			spawnTable[2] = Square:new({xPos=150, yPos=200});
+			spawnTable[3] = Triangle:new({xPos=25, yPos=300});
+
+			currentEnemy[enemyI] = spawnTable[math.random(1, 3)]; 
+			currentEnemy[enemyI]:spawn();
+			currentEnemy[enemyI]:move();
+			currentEnemy[enemyI]:shoot(800);
+
+			enemyI = enemyI + 1;
+
+	end, round);
+end
+
+local function towerCreate(event)
+
+	print(event.target.id);
+	if(event.target.id == "towerBtn1") then
+		towerPlacement1.contains = 1;
+		towerPlacement1.shape = tower:new({xPos=display.contentWidth/6, yPos=display.contentHeight/1.2});
+		towerPlacement1.shape:spawn();
+		towerPlacement1.shape:shoot(800);
+
+		towerPlacementbtn1.isVisible = false;
+	elseif(event.target.id == "towerBtn2")then
+		towerPlacement2.contains = 1;
+		towerPlacement2.shape = tower:new({xPos=display.contentWidth/3.4, yPos=display.contentHeight/1.3});
+		towerPlacement2.shape:spawn();
+		towerPlacement2.shape:shoot(800);
+
+		event.target:removeSelf();
+		event.target = nil;
+	elseif(event.target.id == "towerBtn3")then
+		towerPlacement3.contains = 1;
+		towerPlacement3.shape = tower:new({xPos=display.contentWidth/1.4, yPos=display.contentHeight/1.3});
+		towerPlacement3.shape:spawn();
+		towerPlacement3.shape:shoot(800);
+
+		event.target:removeSelf();
+		event.target = nil;		
+	elseif(event.target.id == "towerBtn4")then
+		towerPlacement4.contains = 1;
+		towerPlacement4.shape = tower:new({xPos=display.contentWidth/1.15, yPos=display.contentHeight/1.2});
+		towerPlacement4.shape:spawn();
+		towerPlacement4.shape:shoot(800);
+
+		event.target:removeSelf();
+		event.target = nil;
+	end
+
+	if(towerPlacement1.contains == 0) then
+		towerPlacementbtn1.isVisible = false;
+	end
+
+	if(towerPlacement2.contains == 0) then
+		towerPlacementbtn2.isVisible = false;
+	end
+
+	if(towerPlacement3.contains == 0) then
+		towerPlacementbtn3.isVisible = false;
+	end
+
+	if(towerPlacement4.contains == 0) then
+		towerPlacementbtn4.isVisible = false;
+	end
+end
+
+
+local function towerPurchase(event)
+	if(gold < 100) then
+		--do nothing place holder
+	else
+		local temp = event.target:getLabel();
+		print(temp)
+		local parameters = {};
+		if(towerPlacement1.contains == 0)then
+
+			towerPlacementbtn1:setLabel(temp);
+			towerPlacementbtn1.isVisible = true;
+			towerPlacementbtn1:addEventListener("tap",towerCreate);
+
+		end
+
+		if(towerPlacement2.contains == 0)then
+	
+			towerPlacementbtn2:setLabel(temp);
+			towerPlacementbtn2.isVisible = true;
+			towerPlacementbtn2:addEventListener("tap",towerCreate);
+		end
+
+		if(towerPlacement3.contains == 0)then
+			towerPlacementbtn3:setLabel(temp);
+			towerPlacementbtn3.isVisible = true;
+			towerPlacementbtn3:addEventListener("tap",towerCreate);
+		end
+
+		if(towerPlacement4.contains == 0)then
+
+			towerPlacementbtn4:setLabel(temp);
+			towerPlacementbtn4.isVisible = true;
+			towerPlacementbtn4:addEventListener("tap",towerCreate);
+		end
+	end
+end
+
+
+
+local function towerPage()
+	towerOptionbtn1.isVisible = true;
+	towerOptionbtn1:addEventListener("tap",towerPurchase);
+
+	towerOptionbtn2.isVisible = true;
+	towerOptionbtn2:addEventListener("tap",towerPurchase);
+end
+
+local function roundEnd()
+
+	round = round + 1;
+	print("round ended")
+
+	Menu = display.newRect(display.contentWidth/2,display.contentHeight/2, 
+				display.contentWidth*.75, 500);
+	Menu.alpha = .5;
+	Menu:setFillColor(0, 0, 1);
+
+	nextRound = display.newRect(display.contentWidth/2,display.contentHeight/1.3, 
+				display.contentWidth/5, display.contentHeight/14);
+	nextRound:addEventListener("tap", roundStart);
+
+	towerTab = display.newRect(display.contentWidth/5,display.contentHeight/3.8, 
+		display.contentWidth/5, display.contentHeight/16);	
+	towerTab:addEventListener("tap", towerPage);
+
+	--itemTab = display.newRect(display.contentWidth/5,display.contentHeight/3.8, 
+	--	display.contentWidth/5, display.contentHeight/16);	
+	--itemTab:addEventListener("tap", itemPage);
+end
 
 -- Projectile 
 local cnt = 0;
 local function fire (event) 
-  if (cnt < 3) then
+  if (cnt < 4) then
     cnt = cnt+1;
 
 	local p = display.newCircle (cube.x, cube.y-30, 5);
 	p.anchorY = 1;
 	p:setFillColor(0,1,0);
-	physics.addBody (p, "dynamic", {radius=5, filter=CollisionFilters.bullet} );
-	p:applyForce(0, -2, p.x, p.y);
+	physics.addBody (p, "dynamic", {radius=10, filter=CollisionFilters.bullet} );
+	p:applyForce(0, -4, p.x, p.y);
 
 	audio.play( soundTable["shootSound"] );
 	
@@ -74,8 +368,20 @@ local function fire (event)
 
          if (event.other.tag == "enemy") then
 
-         	event.other.pp:hit();
+    		event.other.pp:hit();
+
+         	if(event.other.pp.HP == 0) then
+         		gold = gold + 20;
+         		scoreText.text = "Gold: " .. gold;
+         		enemyTotal = enemyTotal - 1;
+         		print("Enemies: " ..enemyTotal);
+         		print("Gold: " ..gold);
+         	end
          	
+         	if(enemyTotal == 0) then
+            	roundEnd();
+            end
+
          end
       end
     end
@@ -87,23 +393,32 @@ controlBar:addEventListener("tap", fire)
 
 local function onBottomCollision(event)
 
-	--if(event.other.tag == "shot") then
-		--do nothing
-		print("hit");
-	--else
-	    if ( event.phase == "began") then
-	        print(  "collision began with " .. event.other.pp.tag )
-	        event.other:removeSelf();
-            event.other=nil;
-	    elseif ( event.phase == "ended" ) then
-	        print( ": collision ended with " .. event.other.pp.tag )
-	    end
-	--end
+    if ( event.phase == "began") then
+    	if (event.other.tag == "enemy") then
+    		print("Before: " .. baseHP);
+     		baseHP = baseHP - event.other.pp.HP;
+     		print("After: " .. baseHP);
+     		enemyTotal = enemyTotal - 1;
+     		print("Enemies: " ..enemyTotal);
+     		event.other:removeSelf();
+        	event.other=nil;
+
+        	if(enemyTotal == 0) then
+        		roundEnd();
+        	end
+     	else
+     		event.other:removeSelf();
+        	event.other=nil;
+     	end
+    elseif ( event.phase == "ended" ) then
+
+    end
 end
+
 bottom:addEventListener("collision", onBottomCollision);
 
-local scoreText = 
-    display.newEmbossedText( "Hit: 0", 200, 50,
+scoreText = 
+    display.newEmbossedText( "Gold: " .. gold, 200, 50,
                              native.systemFont, 40 );
 
 scoreText:setFillColor( 0,0.5,0 );
@@ -115,23 +430,6 @@ local color =
 }
 scoreText:setEmbossColor( color );
 
-scoreText.hit = 0;
+scoreText.gold = gold;
 
-
-
----- Enemy Creation
-
-local x = Enemy:new({xPos=500, yPos=300});
-x:spawn();
-x:move();
---x:shoot(500);
-
-local sq = Square:new({xPos=150, yPos=200});
-sq:spawn();
-sq:move();
---sq:shoot(500);
-
-local tr = Triangle:new({xPos=25, yPos=300});
-tr:spawn();
-tr:move();
---tr:shoot(500);
+roundStart();
