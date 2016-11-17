@@ -1,10 +1,17 @@
+--RICKY, BRANDON, ROLANDO--
+--DR. Kim--
+--FINAL PROJECT--
+
+
 local composer = require ("composer");
 local widget = require ("widget");
 local soundboard = require ("soundTable");
 
+--varible to hold random number in titleChange function
 local switcher;
-
+--loading main music
 local backgroundMusic = audio.loadStream( "mainTheme.wav" );
+--haaving it play on 1 channel and repeating
 local backgroundMusicChannel = audio.play( backgroundMusic, { channel=1, loops=-1, fadein=1000 } )
 
 local background = display.newImageRect("background.jpg", display.contentWidth, display.contentHeight)
@@ -13,7 +20,9 @@ background.x, background.y = display.contentCenterX, display.contentCenterY;
 local title = display.newImageRect("title1.png",1024, 576);
 title.x, title.y = display.contentCenterX, display.contentCenterY/2;
 
+--function used by timer to change title image
 local function titleChange(event)
+	--used to determine which image to use
 	switcher = math.random(1,2);
 	
 	if (switcher == 1) then
@@ -53,7 +62,9 @@ local function exitSteps()
 	godBtn = nil;
 	defBtn:removeSelf();
 	defBtn = nil;
-	
+end
+
+local function stopAudio()
 	audio.stop( backgroundMusicChannel )
 	backgroundMusicChannel = nil
 	audio.dispose(backgroundMusic);
@@ -63,12 +74,14 @@ end
 local function start (event)
 	composer.gotoScene("level1",options);
 	exitSteps();
+	stopAudio();
 	print("Start Game");
 end
 
 local function godMode(event)
 	composer.gotoScene("level1", options);
 	exitSteps();
+	stopAudio();
 	print("God Mode");
 	
 end
