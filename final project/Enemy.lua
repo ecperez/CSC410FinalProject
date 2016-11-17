@@ -84,8 +84,8 @@ function Enemy:shoot (interval)
 
     local function shotHandler (event)
       if (event.phase == "began") then
-	  event.target:removeSelf();
-   	  event.target = nil;
+	      event.target:removeSelf();
+   	    event.target = nil;
       end
     end
     p:addEventListener("collision", shotHandler);		

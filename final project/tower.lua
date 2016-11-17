@@ -1,5 +1,6 @@
 local soundTable=require("soundTable");
 local CollisionFilters = require("CollisionFilters");
+local data = require("data");
 
 local tower = {tag="tower", HP=4, xPos=display.contentWidth/2, yPos=0};
 
@@ -33,8 +34,28 @@ function tower:shoot (interval)
 
     local function shotHandler (event)
       if (event.phase == "began") then
+
+      --print("you got me")
 	  event.target:removeSelf();
    	  event.target = nil;
+
+   	    if (event.other.tag == "enemy") then
+
+    		event.other.pp:hit();
+    		print("hit an enemy")
+         	if(event.other.pp.HP == 0) then
+         		--gold = gold + 20;
+         		--scoreText.text = "Gold: " .. gold;
+         		data.enemyCount = data.enemyCount - 1;
+         		print("Enemies: " ..data.enemyCount);
+         		--print("Gold: " ..gold);
+         	end
+         	
+         	if(data.enemyCount == 0) then
+            	roundEnd();
+            end
+
+        end
       end
     end
     p:addEventListener("collision", shotHandler);		

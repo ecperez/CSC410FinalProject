@@ -1,3 +1,4 @@
+
 local physics = require("physics");
 physics.start();
 physics.setDrawMode("hybrid");
@@ -10,6 +11,7 @@ local soundTable=require("soundTable");
 local Square = require ("Square");
 local Triangle = require ("Triangle");
 local CollisionFilters = require("CollisionFilters");
+local data = require("data");
 local scoreText;
 local instructionText;
 
@@ -19,7 +21,8 @@ local nextRound;
 local towerTab;
 local itemTab;
 
-
+--Function
+local towerPurchase;
 local towerOption2 = {};
 
 local towerPlacement1 = {};
@@ -33,9 +36,12 @@ towerPlacement3.contains = 0;
 towerPlacement4.contains = 0;
 -- game variables
 
+local itemSelected = 0;
 local round = 1;
-local enemyTotal = round;
-local gold = 100;
+
+local gold = 1000;
+data.enemyCount = round;
+print(data.enemyCount)
 
 --Buttons
 
@@ -193,10 +199,15 @@ local function roundStart()
 		Menu:removeSelf();
         Menu=nil;
 
+        towerOptionbtn1.isVisible = false;
+        towerOptionbtn2.isVisible = false;
+
         nextRound:removeSelf();
         nextRound=nil;
 
-        enemyTotal = round;
+        towerTab:removeSelf();
+        towerTab=nil;
+        data.enemyCount = round;
 	end
 
 	local currentEnemy = {};
@@ -230,84 +241,140 @@ local function towerCreate(event)
 		towerPlacement1.shape:spawn();
 		towerPlacement1.shape:shoot(800);
 
+		gold = gold - 100;
+		scoreText.text = "Gold: " .. gold;
+
 		towerPlacementbtn1.isVisible = false;
+		towerPlacementbtn1:removeEventListener( "tap", towerCreate);
 	elseif(event.target.id == "towerBtn2")then
 		towerPlacement2.contains = 1;
 		towerPlacement2.shape = tower:new({xPos=display.contentWidth/3.4, yPos=display.contentHeight/1.3});
 		towerPlacement2.shape:spawn();
 		towerPlacement2.shape:shoot(800);
 
-		event.target:removeSelf();
-		event.target = nil;
+		gold = gold - 100;
+		scoreText.text = "Gold: " .. gold;
+
+		towerPlacementbtn2.isVisible = false;
+		towerPlacementbtn2:removeEventListener( "tap", towerCreate);
 	elseif(event.target.id == "towerBtn3")then
 		towerPlacement3.contains = 1;
 		towerPlacement3.shape = tower:new({xPos=display.contentWidth/1.4, yPos=display.contentHeight/1.3});
 		towerPlacement3.shape:spawn();
 		towerPlacement3.shape:shoot(800);
 
-		event.target:removeSelf();
-		event.target = nil;		
+		gold = gold - 100;
+		scoreText.text = "Gold: " .. gold;
+
+		towerPlacementbtn3.isVisible = false;
+		towerPlacementbtn3:removeEventListener( "tap", towerCreate);
 	elseif(event.target.id == "towerBtn4")then
 		towerPlacement4.contains = 1;
 		towerPlacement4.shape = tower:new({xPos=display.contentWidth/1.15, yPos=display.contentHeight/1.2});
 		towerPlacement4.shape:spawn();
 		towerPlacement4.shape:shoot(800);
 
-		event.target:removeSelf();
-		event.target = nil;
+		gold = gold - 100;
+		scoreText.text = "Gold: " .. gold;
+
+		towerPlacementbtn4.isVisible = false;
+		towerPlacementbtn4:removeEventListener( "tap", towerCreate);
 	end
 
 	if(towerPlacement1.contains == 0) then
 		towerPlacementbtn1.isVisible = false;
+		towerPlacementbtn1:removeEventListener( "tap", towerCreate);
 	end
 
 	if(towerPlacement2.contains == 0) then
 		towerPlacementbtn2.isVisible = false;
+		towerPlacementbtn2:removeEventListener( "tap", towerCreate);
 	end
 
 	if(towerPlacement3.contains == 0) then
 		towerPlacementbtn3.isVisible = false;
+		towerPlacementbtn3:removeEventListener( "tap", towerCreate);
+
 	end
 
 	if(towerPlacement4.contains == 0) then
 		towerPlacementbtn4.isVisible = false;
+		towerPlacementbtn4:removeEventListener( "tap", towerCreate);
+
+	end
+end
+local function cancelTowerPurchase(event)
+	if(itemSelected == 0)then
+		towerOptionbtn1:addEventListener("tap",towerPurchase);
+		towerOptionbtn1:removeEventListener("tap",cancelTowerPurchase);
+
+	else
+		print("whaddup")
+		if(towerPlacement1.contains == 0) then
+			towerPlacementbtn1.isVisible = false;
+			towerPlacementbtn1:removeEventListener( "tap", towerCreate);
+		end
+
+		if(towerPlacement2.contains == 0) then
+			towerPlacementbtn2.isVisible = false;
+			towerPlacementbtn2:removeEventListener( "tap", towerCreate);
+		end
+
+		if(towerPlacement3.contains == 0) then
+			towerPlacementbtn3.isVisible = false;
+			towerPlacementbtn3:removeEventListener( "tap", towerCreate);
+
+		end
+
+		if(towerPlacement4.contains == 0) then
+			towerPlacementbtn4.isVisible = false;
+			towerPlacementbtn4:removeEventListener( "tap", towerCreate);
+
+		end
+		itemSelected = 0;
 	end
 end
 
-
-local function towerPurchase(event)
-	if(gold < 100) then
-		--do nothing place holder
+function towerPurchase(event)
+	if(itemSelected == 1)then
+		towerOptionbtn1:removeEventListener("tap",towerPurchase);
+		towerOptionbtn1:addEventListener("tap",cancelTowerPurchase);
 	else
-		local temp = event.target:getLabel();
-		print(temp)
-		local parameters = {};
-		if(towerPlacement1.contains == 0)then
+		if(gold < 100) then
+			--do nothing place holder
+		else
 
-			towerPlacementbtn1:setLabel(temp);
-			towerPlacementbtn1.isVisible = true;
-			towerPlacementbtn1:addEventListener("tap",towerCreate);
+			local temp = event.target:getLabel();
+			print(temp)
+			local parameters = {};
+			if(towerPlacement1.contains == 0)then
 
-		end
+				towerPlacementbtn1:setLabel(temp);
+				towerPlacementbtn1.isVisible = true;
+				towerPlacementbtn1:addEventListener("tap",towerCreate);
 
-		if(towerPlacement2.contains == 0)then
-	
-			towerPlacementbtn2:setLabel(temp);
-			towerPlacementbtn2.isVisible = true;
-			towerPlacementbtn2:addEventListener("tap",towerCreate);
-		end
+			end
 
-		if(towerPlacement3.contains == 0)then
-			towerPlacementbtn3:setLabel(temp);
-			towerPlacementbtn3.isVisible = true;
-			towerPlacementbtn3:addEventListener("tap",towerCreate);
-		end
+			if(towerPlacement2.contains == 0)then
+		
+				towerPlacementbtn2:setLabel(temp);
+				towerPlacementbtn2.isVisible = true;
+				towerPlacementbtn2:addEventListener("tap",towerCreate);
+			end
 
-		if(towerPlacement4.contains == 0)then
+			if(towerPlacement3.contains == 0)then
+				towerPlacementbtn3:setLabel(temp);
+				towerPlacementbtn3.isVisible = true;
+				towerPlacementbtn3:addEventListener("tap",towerCreate);
+			end
 
-			towerPlacementbtn4:setLabel(temp);
-			towerPlacementbtn4.isVisible = true;
-			towerPlacementbtn4:addEventListener("tap",towerCreate);
+			if(towerPlacement4.contains == 0)then
+
+				towerPlacementbtn4:setLabel(temp);
+				towerPlacementbtn4.isVisible = true;
+				towerPlacementbtn4:addEventListener("tap",towerCreate);
+			end
+			itemSelected = 1;
 		end
 	end
 end
@@ -317,7 +384,6 @@ end
 local function towerPage()
 	towerOptionbtn1.isVisible = true;
 	towerOptionbtn1:addEventListener("tap",towerPurchase);
-
 	towerOptionbtn2.isVisible = true;
 	towerOptionbtn2:addEventListener("tap",towerPurchase);
 end
@@ -373,12 +439,12 @@ local function fire (event)
          	if(event.other.pp.HP == 0) then
          		gold = gold + 20;
          		scoreText.text = "Gold: " .. gold;
-         		enemyTotal = enemyTotal - 1;
-         		print("Enemies: " ..enemyTotal);
+         		data.enemyCount = data.enemyCount - 1;
+         		print("Enemies: " ..data.enemyCount);
          		print("Gold: " ..gold);
          	end
          	
-         	if(enemyTotal == 0) then
+         	if(data.enemyCount == 0) then
             	roundEnd();
             end
 
@@ -398,12 +464,12 @@ local function onBottomCollision(event)
     		print("Before: " .. baseHP);
      		baseHP = baseHP - event.other.pp.HP;
      		print("After: " .. baseHP);
-     		enemyTotal = enemyTotal - 1;
-     		print("Enemies: " ..enemyTotal);
+     		data.enemyCount = data.enemyCount - 1;
+     		print("Enemies: " ..data.enemyCount);
      		event.other:removeSelf();
         	event.other=nil;
 
-        	if(enemyTotal == 0) then
+        	if(data.enemyCount == 0) then
         		roundEnd();
         	end
      	else
