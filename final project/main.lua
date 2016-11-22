@@ -279,6 +279,11 @@ local function roundStart()
         towerOptionbtn1.isVisible = false;
         towerOptionbtn2.isVisible = false;
 
+        towerPlacementbtn1.isVisible = false;
+        towerPlacementbtn2.isVisible = false;
+        towerPlacementbtn3.isVisible = false;
+        towerPlacementbtn4.isVisible = false;
+
         nextRound:removeSelf();
         nextRound=nil;
 
@@ -287,6 +292,10 @@ local function roundStart()
 
         towerTab:removeSelf();
         towerTab=nil;
+
+        itemTab:removeSelf();
+        itemTab=nil;
+
         data.enemyCount = round;
 
     	if(towerPlacement1.contains == 1)then
@@ -683,19 +692,61 @@ local function bHealPurchase()
 end
 
 local function itemPage()
-	itemOptionbtn1.isVisible = true;
-	itemOptionbtn1:addEventListener("tap",bombPurchase);
-	itemOptionbtn2.isVisible = true;
-	itemOptionbtn2:addEventListener("tap",pHealPurchase);
-	itemOptionbtn3.isVisible = true;
-	itemOptionbtn3:addEventListener("tap",bHealPurchase);
+    if(towerOptionbtn1.isVisible == true)then
+    	towerOptionbtn1.isVisible = false;
+		towerOptionbtn1:removeEventListener("tap",towerPurchase);
+		towerOptionbtn2.isVisible = false;
+		towerOptionbtn2:removeEventListener("tap",gTowerPurchase);
+    end
+
+    if(towerPlacementbtn1.isVisible == true or towerPlacementbtn2.isVisible == true or towerPlacementbtn3.isVisible == true or towerPlacementbtn4.isVisible == true) then
+    	towerPlacementbtn1.isVisible = false;
+		towerPlacementbtn1:removeEventListener( "tap", towerCreate);
+		towerPlacementbtn1:removeEventListener( "tap", gTowerCreate);
+
+		towerPlacementbtn2.isVisible = false;
+		towerPlacementbtn2:removeEventListener( "tap", towerCreate);
+		towerPlacementbtn2:removeEventListener( "tap", gTowerCreate);
+
+		towerPlacementbtn3.isVisible = false;
+		towerPlacementbtn3:removeEventListener( "tap", towerCreate);
+		towerPlacementbtn3:removeEventListener( "tap", gTowerCreate);
+
+		towerPlacementbtn4.isVisible = false;
+		towerPlacementbtn4:removeEventListener( "tap", towerCreate);
+		towerPlacementbtn4:removeEventListener( "tap", gTowerCreate);				
+    end	
+
+    if(itemOptionbtn1.isVisible == true)then
+    	--do nothing
+    else
+		itemOptionbtn1.isVisible = true;
+		itemOptionbtn1:addEventListener("tap",bombPurchase);
+		itemOptionbtn2.isVisible = true;
+		itemOptionbtn2:addEventListener("tap",pHealPurchase);
+		itemOptionbtn3.isVisible = true;
+		itemOptionbtn3:addEventListener("tap",bHealPurchase);
+	end
 end
 
 local function towerPage()
-	towerOptionbtn1.isVisible = true;
-	towerOptionbtn1:addEventListener("tap",towerPurchase);
-	towerOptionbtn2.isVisible = true;
-	towerOptionbtn2:addEventListener("tap",gTowerPurchase);
+	if(itemOptionbtn1.isVisible == true)then
+		itemOptionbtn1.isVisible = false;
+		itemOptionbtn1:removeEventListener("tap",bombPurchase);
+		itemOptionbtn2.isVisible = false;
+		itemOptionbtn2:removeEventListener("tap",pHealPurchase);
+		itemOptionbtn3.isVisible = false;
+		itemOptionbtn3:removeEventListener("tap",bHealPurchase);
+	end
+
+	if(towerOptionbtn1.isVisible == true)then
+		--do nothing
+	else
+		towerOptionbtn1.isVisible = true;
+		towerOptionbtn1:addEventListener("tap",towerPurchase);
+		towerOptionbtn2.isVisible = true;
+		towerOptionbtn2:addEventListener("tap",gTowerPurchase);
+	end
 end
 
 function roundEnd()
