@@ -21,6 +21,7 @@ local nextRound;
 local towerTab;
 local itemTab;
 local scoreText;
+local bombText;
 
 --Function
 local towerPurchase;
@@ -44,6 +45,63 @@ data.enemyCount = round;
 local endCheck;
 
 --Buttons
+
+local itemOptionbtn1 = widget.newButton(
+{
+	x = display.contentWidth/4.8,
+	y = display.contentHeight/2.8,
+	id = "item1",
+	--optionNum = 1,
+	label = "Bomb",
+	onEvent = bombPurchase,
+	emboss = false,
+	shape = "roundedRect",
+	width = display.contentWidth/10,
+	height = display.contentHeight/16,
+	cornerRadius = 2,
+	fillColor = { default={0,1,.4,1}, over={0,1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+itemOptionbtn1.isVisible = false;
+
+local itemOptionbtn2 = widget.newButton(
+{
+	x = display.contentWidth/4.8,
+	y = display.contentHeight/1.8,
+	id = "item2",
+	--optionNum = 1,
+	label = "Player Heal",
+	onEvent = pHealPurchase,
+	emboss = false,
+	shape = "roundedRect",
+	width = display.contentWidth/10,
+	height = display.contentHeight/16,
+	cornerRadius = 2,
+	fillColor = { default={0,1,.4,1}, over={0,1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+itemOptionbtn2.isVisible = false;
+
+local itemOptionbtn3 = widget.newButton(
+{
+	x = display.contentWidth/2.8,
+	y = display.contentHeight/2.8,
+	id = "item3",
+	--optionNum = 1,
+	label = "Base Heal",
+	onEvent = bHealPurchase,
+	emboss = false,
+	shape = "roundedRect",
+	width = display.contentWidth/10,
+	height = display.contentHeight/16,
+	cornerRadius = 2,
+	fillColor = { default={0,1,.4,1}, over={0,1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+itemOptionbtn3.isVisible = false;
 
 local towerOptionbtn1 = widget.newButton(
 {
@@ -168,30 +226,49 @@ controlBar:setFillColor(1,1,1,0.5);
 ---- Main Player
 
 local cube = display.newCircle (display.contentCenterX, display.contentHeight-150, 25);
-cube.hp = 10;
-
-local baseHP = 20;
+bombText = display.newText( "Bomb: " .. data.bombCount, display.contentWidth-200, 50,
+                        native.systemFont, 40 );
 
 physics.addBody (cube, "kinematic", {filter=CollisionFilters.player});
 
 local function move ( event )
-	 if event.phase == "began" then		
+	if(data.playerHP < 1)then
+		--do nothing
+	else
+		if event.phase == "began" then		
 		cube.markX = cube.x 
-	 elseif event.phase == "moved" then	 	
-	 	local x = (event.x - event.xStart) + cube.markX	 	
+		elseif event.phase == "moved" then	 	
+	 		local x = (event.x - event.xStart) + cube.markX	 	
 	 	
-	 	if (x <= 20 + cube.width/2) then
-		   cube.x = 20+cube.width/2;
-		elseif (x >= display.contentWidth-20-cube.width/2) then
-		   cube.x = display.contentWidth-20-cube.width/2;
-		else
-		   cube.x = x;		
-		end
+	 		if (x <= 20 + cube.width/2) then
+		   		cube.x = 20+cube.width/2;
+			elseif (x >= display.contentWidth-20-cube.width/2) then
+		   		cube.x = display.contentWidth-20-cube.width/2;
+			else
+		   		cube.x = x;		
+			end
 
-	 end
+	 	end
+	end
 end
 
 controlBar:addEventListener("touch", move);
+
+towerDisposal = timer.performWithDelay(10,
+	function()
+		if(data.CurrentTowers[1] == 0)then
+			towerPlacement1.contains = 0;
+		end
+		if(data.CurrentTowers[2] == 0)then
+			towerPlacement2.contains = 0;
+		end
+		if(data.CurrentTowers[3] == 0)then
+			towerPlacement3.contains = 0;
+		end
+		if(data.CurrentTowers[4] == 0)then
+			towerPlacement4.contains = 0;
+		end
+	end, -1);
 
 local function roundStart()
 
@@ -259,8 +336,9 @@ local function towerCreate(event)
 	print(event.target.id);
 	if(event.target.id == "towerBtn1") then
 		towerPlacement1.contains = 1;
-		towerPlacement1.shape = tower:new({xPos=display.contentWidth/6, yPos=display.contentHeight/1.2});
+		towerPlacement1.shape = tower:new({xPos=display.contentWidth/6, yPos=display.contentHeight/1.2, tPos = 1});
 		towerPlacement1.shape:spawn();
+		data.CurrentTowers[1] = 1; 
 
 		data.gold = data.gold - 100;
 		scoreText.text = "Gold: " .. data.gold;
@@ -269,8 +347,9 @@ local function towerCreate(event)
 		towerPlacementbtn1:removeEventListener( "tap", towerCreate);
 	elseif(event.target.id == "towerBtn2")then
 		towerPlacement2.contains = 1;
-		towerPlacement2.shape = tower:new({xPos=display.contentWidth/3.4, yPos=display.contentHeight/1.3});
+		towerPlacement2.shape = tower:new({xPos=display.contentWidth/3.4, yPos=display.contentHeight/1.3, tPos = 2});
 		towerPlacement2.shape:spawn();
+		data.CurrentTowers[2] = 1; 
 
 		data.gold = data.gold - 100;
 		scoreText.text = "Gold: " .. data.gold;
@@ -279,8 +358,9 @@ local function towerCreate(event)
 		towerPlacementbtn2:removeEventListener( "tap", towerCreate);
 	elseif(event.target.id == "towerBtn3")then
 		towerPlacement3.contains = 1;
-		towerPlacement3.shape = tower:new({xPos=display.contentWidth/1.4, yPos=display.contentHeight/1.3});
+		towerPlacement3.shape = tower:new({xPos=display.contentWidth/1.4, yPos=display.contentHeight/1.3, tPos = 3});
 		towerPlacement3.shape:spawn();
+		data.CurrentTowers[3] = 1; 
 
 		data.gold = data.gold - 100;
 		scoreText.text = "Gold: " .. data.gold;
@@ -289,8 +369,9 @@ local function towerCreate(event)
 		towerPlacementbtn3:removeEventListener( "tap", towerCreate);
 	elseif(event.target.id == "towerBtn4")then
 		towerPlacement4.contains = 1;
-		towerPlacement4.shape = tower:new({xPos=display.contentWidth/1.15, yPos=display.contentHeight/1.2});
+		towerPlacement4.shape = tower:new({xPos=display.contentWidth/1.15, yPos=display.contentHeight/1.2, tPos = 4});
 		towerPlacement4.shape:spawn();
+		data.CurrentTowers[4] = 1; 
 
 		data.gold = data.gold - 100;
 		scoreText.text = "Gold: " .. data.gold;
@@ -328,8 +409,9 @@ local function gTowerCreate(event)
 	print("made it");
 	if(event.target.id == "towerBtn1") then
 		towerPlacement1.contains = 1;
-		towerPlacement1.shape = goldTower:new({xPos=display.contentWidth/6, yPos=display.contentHeight/1.2});
+		towerPlacement1.shape = goldTower:new({xPos=display.contentWidth/6, yPos=display.contentHeight/1.2, tPos = 1});
 		towerPlacement1.shape:spawn();
+		data.CurrentTowers[1] = 1; 
 
 		data.gold = data.gold - 200;
 		scoreText.text = "Gold: " .. data.gold;
@@ -338,8 +420,9 @@ local function gTowerCreate(event)
 		towerPlacementbtn1:removeEventListener( "tap", gTowerCreate);
 	elseif(event.target.id == "towerBtn2")then
 		towerPlacement2.contains = 1;
-		towerPlacement2.shape = goldTower:new({xPos=display.contentWidth/3.4, yPos=display.contentHeight/1.3});
+		towerPlacement2.shape = goldTower:new({xPos=display.contentWidth/3.4, yPos=display.contentHeight/1.3, tPos = 2});
 		towerPlacement2.shape:spawn();
+		data.CurrentTowers[2] = 1; 
 
 		data.gold = data.gold - 200;
 		scoreText.text = "Gold: " .. data.gold;
@@ -348,8 +431,9 @@ local function gTowerCreate(event)
 		towerPlacementbtn2:removeEventListener( "tap", gTowerCreate);
 	elseif(event.target.id == "towerBtn3")then
 		towerPlacement3.contains = 1;
-		towerPlacement3.shape = goldTower:new({xPos=display.contentWidth/1.4, yPos=display.contentHeight/1.3});
+		towerPlacement3.shape = goldTower:new({xPos=display.contentWidth/1.4, yPos=display.contentHeight/1.3, tPos = 3});
 		towerPlacement3.shape:spawn();
+		data.CurrentTowers[3] = 1; 
 
 		data.gold = data.gold - 200;
 		scoreText.text = "Gold: " .. data.gold;
@@ -358,8 +442,9 @@ local function gTowerCreate(event)
 		towerPlacementbtn3:removeEventListener( "tap", gTowerCreate);
 	elseif(event.target.id == "towerBtn4")then
 		towerPlacement4.contains = 1;
-		towerPlacement4.shape = goldTower:new({xPos=display.contentWidth/1.15, yPos=display.contentHeight/1.2});
+		towerPlacement4.shape = goldTower:new({xPos=display.contentWidth/1.15, yPos=display.contentHeight/1.2, tPos = 4});
 		towerPlacement4.shape:spawn();
+		data.CurrentTowers[4] = 1; 
 
 		data.gold = data.gold - 200;
 		scoreText.text = "Gold: " .. data.gold;
@@ -557,6 +642,55 @@ function gTowerPurchase(event)
 	end
 end
 
+local function bombPurchase()
+	if(data.gold < 200) then
+		--do nothing for now
+	else
+		print("BombCount Before: " .. data.bombCount);
+		data.bombCount = data.bombCount + 1;
+		bombText.text = "Bomb: " .. data.bombCount;
+		print("BombCount After: " .. data.bombCount);
+
+		data.gold = data.gold - 200;
+		scoreText.text = "Gold: " .. data.gold;
+	end
+end
+
+local function pHealPurchase()
+	if(data.gold < 200 or data.playerHP == 10) then
+		--do nothing for now
+	else
+		print("Player HP Before: " .. data.playerHP);
+		data.playerHP = data.playerHP + 1;
+		print("Player HP After: " .. data.playerHP);
+
+		data.gold = data.gold - 200;
+		scoreText.text = "Gold: " .. data.gold;
+	end
+end
+
+local function bHealPurchase()
+	if(data.gold < 200 or data.baseHP == 20) then
+		--do nothing for now
+	else
+		print("Base HP Before: " .. data.baseHP);
+		data.baseHP = data.baseHP + 1;
+		print("Player HP After: " .. data.baseHP);
+
+		data.gold = data.gold - 200;
+		scoreText.text = "Gold: " .. data.gold;
+	end
+end
+
+local function itemPage()
+	itemOptionbtn1.isVisible = true;
+	itemOptionbtn1:addEventListener("tap",bombPurchase);
+	itemOptionbtn2.isVisible = true;
+	itemOptionbtn2:addEventListener("tap",pHealPurchase);
+	itemOptionbtn3.isVisible = true;
+	itemOptionbtn3:addEventListener("tap",bHealPurchase);
+end
+
 local function towerPage()
 	towerOptionbtn1.isVisible = true;
 	towerOptionbtn1:addEventListener("tap",towerPurchase);
@@ -579,7 +713,7 @@ function roundEnd()
 		timer.pause(towerPlacement4.shape.timerRef);
 	end
 
-		timer.pause(endCheck);
+	timer.pause(endCheck);
 	round = round + 1;
 	print("round ended")
 
@@ -596,6 +730,10 @@ function roundEnd()
 		display.contentWidth/5, display.contentHeight/16);	
 	towerTab:addEventListener("tap", towerPage);
 
+	itemTab = display.newRect(display.contentWidth/2.4,display.contentHeight/3.8, 
+		display.contentWidth/5, display.contentHeight/16);	
+	itemTab:addEventListener("tap", itemPage);
+
 	scoreText = display.newText( "Gold: " .. data.gold, 200, 50,
                              native.systemFont, 40 );
 end
@@ -603,55 +741,77 @@ end
 -- Projectile 
 local cnt = 0;
 local function fire (event) 
-  if (cnt < 4) then
-    cnt = cnt+1;
+	if(data.playerHP < 1)then
+		--do nothing
+	else
+	  if (cnt < 4) then
+	    cnt = cnt+1;
 
-	local p = display.newCircle (cube.x, cube.y-30, 5);
-	p.anchorY = 1;
-	p:setFillColor(0,1,0);
-	physics.addBody (p, "dynamic", {radius=10, filter=CollisionFilters.bullet} );
-	p:applyForce(0, -4, p.x, p.y);
+		local p = display.newCircle (cube.x, cube.y-30, 5);
+		p.anchorY = 1;
+		p:setFillColor(0,1,0);
+		physics.addBody (p, "dynamic", {radius=10, filter=CollisionFilters.bullet} );
+		p:applyForce(0, -4, p.x, p.y);
 
-	audio.play( soundTable["shootSound"] );
-	
+		audio.play( soundTable["shootSound"] );
+		
 
-    local function removeProjectile (event)
-      if (event.phase=="began") then
-	   	 event.target:removeSelf();
-         event.target=nil;
-         cnt = cnt - 1;
+	    local function removeProjectile (event)
+	      if (event.phase=="began") then
+		   	 event.target:removeSelf();
+	         event.target=nil;
+	         cnt = cnt - 1;
 
-         if (event.other.tag == "enemy") then
+	         if (event.other.tag == "enemy") then
 
-    		event.other.pp:hit();
+	    		event.other.pp:hit();
 
-         	if(event.other.pp.HP == 0) then
-         		data.gold = data.gold + 20;
-         		data.enemyCount = data.enemyCount - 1;
-         		print("Enemies: " ..data.enemyCount);
-         		print("Gold: " ..data.gold);
-         	end
-         	
-         	if(data.enemyCount == 0) then
-            	roundEnd();
-            end
+	         	if(event.other.pp.HP == 0) then
+	         		data.gold = data.gold + 20;
+	         		data.enemyCount = data.enemyCount - 1;
+	         		print("Enemies: " ..data.enemyCount);
+	         		print("Gold: " ..data.gold);
+	         	end
+	         	
+	         	if(data.enemyCount == 0) then
+	            	roundEnd();
+	            end
 
-         end
-      end
-    end
-    p:addEventListener("collision", removeProjectile);
-  end
+	         end
+	      end
+	    end
+	    p:addEventListener("collision", removeProjectile);
+	  end
+	end
 end
 
 controlBar:addEventListener("tap", fire)
 
+local function playerHit(event)
+
+    if ( event.phase == "began") then
+    	if (event.other.tag == "shot") then
+    		print("HP Before: " .. data.playerHP);
+     		data.playerHP = data.playerHP - 1;
+     		print("HP After: " .. data.playerHP);
+
+        	if(data.playerHP == 0) then
+        		event.target:removeSelf();
+        		event.target=nil;
+        	end
+       	end
+    elseif ( event.phase == "ended" ) then
+
+    end
+end
+cube:addEventListener("collision", playerHit);
 local function onBottomCollision(event)
 
     if ( event.phase == "began") then
     	if (event.other.tag == "enemy") then
-    		print("Before: " .. baseHP);
-     		baseHP = baseHP - event.other.pp.HP;
-     		print("After: " .. baseHP);
+    		print("Before: " .. data.baseHP);
+     		data.baseHP = data.baseHP - event.other.pp.HP;
+     		print("After: " .. data.baseHP);
      		data.enemyCount = data.enemyCount - 1;
      		print("Enemies: " ..data.enemyCount);
      		event.other:removeSelf();

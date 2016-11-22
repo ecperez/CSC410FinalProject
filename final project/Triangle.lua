@@ -1,6 +1,8 @@
 local Enemy = require ("Enemy");
 local CollisionFilters = require("CollisionFilters");
-
+local tower = require ("tower");
+local soundTable=require("soundTable");
+local data = require("data");
 
 local Triangle = Enemy:new( {HP=3, bR=360, fT=500, 
 				     bT=150});
@@ -46,8 +48,29 @@ function Triangle:shoot (interval)
 		p.tag = "shot";
     local function shotHandler (event)
       if (event.phase == "began") then
-	  event.target:removeSelf();
-   	  event.target = nil;
+	      event.target:removeSelf();
+   	    event.target = nil;
+
+        if(event.other.tag == "tower")then
+          event.other.HP = event.other.HP - 1;
+
+            if (event.other.HP > 0) then 
+              audio.play( soundTable["hitSound"] );
+              
+            else 
+              audio.play( soundTable["explodeSound"] );
+
+              --if (event.other.timerR ~= nil) then
+                print("I got in here boy");
+                timer.cancel ( event.other.timerRef );
+              --end
+              -- die
+              data.CurrentTowers[event.other.tPos] = 0;
+
+              event.other:removeSelf();
+              event.other=nil; 
+            end 
+        end
       end
     end
     p:addEventListener("collision", shotHandler);		
@@ -55,6 +78,8 @@ function Triangle:shoot (interval)
   self.timerRef = timer.performWithDelay(interval, 
 	function (event) createShot(self) end, -1);
   self.timerR = timerRef;
+  self.shape.timerR = self.timerR;
+
 end
 
 

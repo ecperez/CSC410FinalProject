@@ -1,5 +1,7 @@
 local soundTable=require("soundTable");
 local CollisionFilters = require("CollisionFilters");
+local tower = require ("tower");
+local data = require("data");
 
 local Enemy = {tag="enemy", HP=1, xPos=display.contentWidth/2, yPos=0, 
     fR=0, sR=0, bR=0, fT=200, sT=500, bT	=500,  timerR};
@@ -63,7 +65,6 @@ function Enemy:hit ()
 		if (self.timerRef ~= nil) then
 			timer.cancel ( self.timerRef );
 		end
-
 		-- die
 		self.shape:removeSelf();
 		self.shape=nil;	
@@ -86,13 +87,36 @@ function Enemy:shoot (interval)
       if (event.phase == "began") then
 	      event.target:removeSelf();
    	    event.target = nil;
+
+        if(event.other.tag == "tower")then
+          event.other.HP = event.other.HP - 1;
+
+            if (event.other.HP > 0) then 
+              audio.play( soundTable["hitSound"] );
+              
+            else 
+              audio.play( soundTable["explodeSound"] );
+              
+              --tower die
+              --if (event.other.shape.timerR ~= nil) then
+                print("I got in here boy");
+                timer.cancel ( event.other.timerRef );
+              --end
+              data.CurrentTowers[event.other.tPos] = 0;
+              event.other:removeSelf();
+              event.other=nil; 
+              --event = nil;  
+            end 
+        end
       end
     end
     p:addEventListener("collision", shotHandler);		
   end
   self.timerRef = timer.performWithDelay(interval, 
 	function (event) createShot(self) end, -1);
+  self.shape.timerRef = self.timerRef;
   self.timerR = timerRef;
+  self.shape.timerR = self.timerR;
 end
 
 return Enemy;
