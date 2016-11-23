@@ -90,30 +90,34 @@ function Enemy:shoot (interval)
 		p.tag = "shot";
 
     local function shotHandler (event)
-      if (event.phase == "began") then
-	      event.target:removeSelf();
-   	    event.target = nil;
-		
-		if(event.other.tag == "tower")then
-          event.other.HP = event.other.HP - 1;
-      
-			if (event.other.HP > 0) then 
-              audio.play( soundTable["hitSound"] );
-              
-            else 
-              audio.play( soundTable["explodeSound"] );
-              
-              --tower die
-              if (event.other.timerRef ~= nil) then
-                print("I got in here boy");
-                timer.cancel ( event.other.timerRef );
-              end
-              data.CurrentTowers[event.other.tPos] = 0;
-			  print(event.other.tPos .. "  " .. data.CurrentTowers[event.other.tPos]);
-              event.other:removeSelf();
-              event.other=nil; 
-              --event = nil;  
-            end 
+        if (self.shape == nil) then
+	
+        else 
+          if (event.phase == "began") then
+              event.target:removeSelf();
+            event.target = nil;
+
+            if(event.other.tag == "tower")then
+              event.other.HP = event.other.HP - 1;
+
+                if (event.other.HP > 0) then 
+                  audio.play( soundTable["hitSound"] );
+
+                else 
+                  audio.play( soundTable["explodeSound"] );
+
+                  --tower die
+                  if (event.other.timerRef ~= nil) then
+                    print("I got in here boy");
+                    timer.cancel ( event.other.timerRef );
+                  end
+                  data.CurrentTowers[event.other.tPos] = 0;
+                  print(event.other.tPos .. "  " .. data.CurrentTowers[event.other.tPos]);
+                  event.other:removeSelf();
+                  event.other=nil; 
+                  --event = nil;  
+                end 
+            end
         end
       end
     end
