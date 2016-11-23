@@ -104,7 +104,9 @@ function scene:create( event )
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
 	
-
+--create background image
+local bg = display.newImage("temp_background2.jpg",display.contentCenterX, display.contentCenterY);
+bg:toBack();
 
 --ARENA
 top = display.newRect(0,10,display.contentWidth*100, 2);
@@ -1093,9 +1095,11 @@ function scene:show( event )
 					--do nothing
 				else
 					for i = 1, data.sLevel do
-							local p = display.newCircle (cube.x, cube.y-30, 5);
+							local p = display.newSprite(gameSheet,sequenceData);
+							p.x = cube.x;
+							p.y = cube.y-30;
 							p.anchorY = 1;
-							p:setFillColor(0,1,0);
+							p:setSequence("Laser Type 1 Blue");
 							physics.addBody (p, "dynamic", {radius=10, filter=CollisionFilters.bullet} );
 							p:applyForce(shotUpDirectionX[i], shotUpDirectionY[i], p.x, p.y);
 
