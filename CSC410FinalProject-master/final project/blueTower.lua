@@ -34,9 +34,9 @@ function blueTower:shoot (interval)
   local function createShot(obj)
     local p = display.newSprite(gameSheet,sequenceData);
     p.x = obj.shape.x;
-    p.y = obj.shape.y+25;
+    p.y = obj.shape.y-90;
     p.anchorY=0;
-    p:setSequence("Laser Type 1 Red");
+    p:setSequence("Laser Type 1 Green");
     physics.addBody (p, "dynamic", {filter=CollisionFilters.bullet});
     p:applyForce(0, -4, p.x, p.y);
 		p.tag = "shot";
