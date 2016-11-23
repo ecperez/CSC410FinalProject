@@ -83,6 +83,11 @@ shotUpDirectionY[4] = -4;
 shotUpDirectionX[5] = -1;
 shotUpDirectionY[5] = -4;
 
+local options = 
+	{
+		time = 800;
+	}
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -1049,6 +1054,7 @@ function scene:show( event )
 		end
 		
 		function roundEnd()
+		
 			if(towerPlacement1.contains == 1)then
 				timer.pause(towerPlacement1.shape.timerRef);
 				
@@ -1066,16 +1072,19 @@ function scene:show( event )
 			timer.pause(endCheck);
 			round = round + 1;
 			print("round ended")
-			
-			nextBtn.isVisible = true;
-			nextBtn:addEventListener("tap", roundStart);
-			towerBtn.isVisible = true;
-			towerBtn:addEventListener("tap", towerPage);
-			itemBtn.isVisible = true;
-			itemBtn:addEventListener("tap", itemPage);
+			if(data.playerHP == 0 or data.baseHP < 1)then
+			else
+				nextBtn.isVisible = true;
+				nextBtn:addEventListener("tap", roundStart);
+				towerBtn.isVisible = true;
+				towerBtn:addEventListener("tap", towerPage);
+				itemBtn.isVisible = true;
+				itemBtn:addEventListener("tap", itemPage);
+			end
 
 			scoreText = display.newText( "Gold: " .. data.gold, 200, 50,
 									 native.systemFont, 40 );
+									 
 		end
 		
 		-- Projectile 
@@ -1134,9 +1143,13 @@ local function playerHit(event)
      		data.playerHP = data.playerHP - 1;
      		print("HP After: " .. data.playerHP);
 
-        	if(data.playerHP == 0) then
+        	if(data.playerHP == 0 or data.baseHP < 1) then
         		event.target:removeSelf();
         		event.target=nil;
+				
+				
+				
+				composer.gotoScene("ending", options);
         	end
        	end
     elseif ( event.phase == "ended" ) then
