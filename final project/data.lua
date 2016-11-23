@@ -2,8 +2,9 @@ local gData = {};
 
 gData.playerHP = 10;
 gData.baseHP = 20;
-gData.gold = 1000;
+gData.gold = 5000;
 gData.bombCount = 0;
+gData.sLevel = 1;
 
 gData.enemyCount = 0;
 gData.CurrentTowers = {};

@@ -21,7 +21,6 @@ local nextRound;
 local towerTab;
 local itemTab;
 local scoreText;
-local bombText;
 
 --Function
 local towerPurchase;
@@ -43,27 +42,28 @@ local itemSelected = 0;
 local round = 1;
 data.enemyCount = round;
 local endCheck;
+local sUpgradeMax = 5;
+
+local shotUpDirectionX = {}
+local shotUpDirectionY = {}
+
+shotUpDirectionX[1] = 0;
+shotUpDirectionY[1] = -4;
+
+shotUpDirectionX[2] = 2;
+shotUpDirectionY[2] = -4;
+
+shotUpDirectionX[3] = -2;
+shotUpDirectionY[3] = -4;
+
+shotUpDirectionX[4] = 1;
+shotUpDirectionY[4] = -4;
+
+shotUpDirectionX[5] = -1;
+shotUpDirectionY[5] = -4;
+
 
 --Buttons
-
-local itemOptionbtn1 = widget.newButton(
-{
-	x = display.contentWidth/4.8,
-	y = display.contentHeight/2.8,
-	id = "item1",
-	--optionNum = 1,
-	label = "Bomb",
-	onEvent = bombPurchase,
-	emboss = false,
-	shape = "roundedRect",
-	width = display.contentWidth/10,
-	height = display.contentHeight/16,
-	cornerRadius = 2,
-	fillColor = { default={0,1,.4,1}, over={0,1,0.7,0.4} },
-    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
-    strokeWidth = 4
-});
-itemOptionbtn1.isVisible = false;
 
 local itemOptionbtn2 = widget.newButton(
 {
@@ -102,6 +102,25 @@ local itemOptionbtn3 = widget.newButton(
     strokeWidth = 4
 });
 itemOptionbtn3.isVisible = false;
+
+local itemOptionbtn4 = widget.newButton(
+{
+	x = display.contentWidth/2.8,
+	y = display.contentHeight/1.8,
+	id = "item4",
+	--optionNum = 1,
+	label = "Shot Up",
+	onEvent = sUpgradePurchase,
+	emboss = false,
+	shape = "roundedRect",
+	width = display.contentWidth/10,
+	height = display.contentHeight/16,
+	cornerRadius = 2,
+	fillColor = { default={0,1,.4,1}, over={0,1,0.7,0.4} },
+    strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+    strokeWidth = 4
+});
+itemOptionbtn4.isVisible = false;
 
 local towerOptionbtn1 = widget.newButton(
 {
@@ -226,8 +245,6 @@ controlBar:setFillColor(1,1,1,0.5);
 ---- Main Player
 
 local cube = display.newCircle (display.contentCenterX, display.contentHeight-150, 25);
-bombText = display.newText( "Bomb: " .. data.bombCount, display.contentWidth-200, 50,
-                        native.systemFont, 40 );
 
 physics.addBody (cube, "kinematic", {filter=CollisionFilters.player});
 
@@ -275,14 +292,18 @@ local function roundStart()
 	if(round ~= 1)then
 		Menu:removeSelf();
         Menu=nil;
-
-        towerOptionbtn1.isVisible = false;
+        
+         towerOptionbtn1.isVisible = false;
         towerOptionbtn2.isVisible = false;
 
         towerPlacementbtn1.isVisible = false;
         towerPlacementbtn2.isVisible = false;
         towerPlacementbtn3.isVisible = false;
         towerPlacementbtn4.isVisible = false;
+
+        itemOptionbtn2.isVisible = false;
+        itemOptionbtn3.isVisible = false;
+        itemOptionbtn4.isVisible = false;
 
         nextRound:removeSelf();
         nextRound=nil;
@@ -651,20 +672,6 @@ function gTowerPurchase(event)
 	end
 end
 
-local function bombPurchase()
-	if(data.gold < 200) then
-		--do nothing for now
-	else
-		print("BombCount Before: " .. data.bombCount);
-		data.bombCount = data.bombCount + 1;
-		bombText.text = "Bomb: " .. data.bombCount;
-		print("BombCount After: " .. data.bombCount);
-
-		data.gold = data.gold - 200;
-		scoreText.text = "Gold: " .. data.gold;
-	end
-end
-
 local function pHealPurchase()
 	if(data.gold < 200 or data.playerHP == 10) then
 		--do nothing for now
@@ -688,6 +695,16 @@ local function bHealPurchase()
 
 		data.gold = data.gold - 200;
 		scoreText.text = "Gold: " .. data.gold;
+	end
+end
+
+local function sUpgradePurchase()
+	if(data.gold < (data.sLevel * 1000) or data.sLevel == 5)then
+		--do nothing for now
+	else
+		data.gold = data.gold - (data.sLevel * 1000);
+		scoreText.text = "Gold: " .. data.gold;
+		data.sLevel = data.sLevel + 1;
 	end
 end
 
@@ -717,26 +734,27 @@ local function itemPage()
 		towerPlacementbtn4:removeEventListener( "tap", gTowerCreate);				
     end	
 
-    if(itemOptionbtn1.isVisible == true)then
+    if(itemOptionbtn2.isVisible == true)then
     	--do nothing
     else
-		itemOptionbtn1.isVisible = true;
-		itemOptionbtn1:addEventListener("tap",bombPurchase);
+
 		itemOptionbtn2.isVisible = true;
 		itemOptionbtn2:addEventListener("tap",pHealPurchase);
 		itemOptionbtn3.isVisible = true;
 		itemOptionbtn3:addEventListener("tap",bHealPurchase);
+		itemOptionbtn4.isVisible = true;
+		itemOptionbtn4:addEventListener("tap",sUpgradePurchase);
 	end
 end
 
 local function towerPage()
-	if(itemOptionbtn1.isVisible == true)then
-		itemOptionbtn1.isVisible = false;
-		itemOptionbtn1:removeEventListener("tap",bombPurchase);
+	if(itemOptionbtn2.isVisible == true)then
 		itemOptionbtn2.isVisible = false;
 		itemOptionbtn2:removeEventListener("tap",pHealPurchase);
 		itemOptionbtn3.isVisible = false;
 		itemOptionbtn3:removeEventListener("tap",bHealPurchase);
+		itemOptionbtn4.isVisible = false;
+		itemOptionbtn4:removeEventListener("tap",sUpgradePurchase);
 	end
 
 	if(towerOptionbtn1.isVisible == true)then
@@ -790,49 +808,48 @@ function roundEnd()
 end
 
 -- Projectile 
-local cnt = 0;
 local function fire (event) 
 	if(data.playerHP < 1)then
 		--do nothing
 	else
-	  if (cnt < 4) then
-	    cnt = cnt+1;
+		for i = 1, data.sLevel do
+				local p = display.newCircle (cube.x, cube.y-30, 5);
+				p.anchorY = 1;
+				p:setFillColor(0,1,0);
+				physics.addBody (p, "dynamic", {radius=10, filter=CollisionFilters.bullet} );
+				p:applyForce(shotUpDirectionX[i], shotUpDirectionY[i], p.x, p.y);
 
-		local p = display.newCircle (cube.x, cube.y-30, 5);
-		p.anchorY = 1;
-		p:setFillColor(0,1,0);
-		physics.addBody (p, "dynamic", {radius=10, filter=CollisionFilters.bullet} );
-		p:applyForce(0, -4, p.x, p.y);
+				audio.play( soundTable["shootSound"] );
 
-		audio.play( soundTable["shootSound"] );
-		
+			    local function removeProjectile (event)
+			      if (event.phase=="began") then
+			      	if(event.other.tag == "bullet")then
+			      		print("did nothing")
+			      	else
+				   	 event.target:removeSelf();
+			         event.target=nil;
+			         print("removed bullet")
+			         if (event.other.tag == "enemy") then
 
-	    local function removeProjectile (event)
-	      if (event.phase=="began") then
-		   	 event.target:removeSelf();
-	         event.target=nil;
-	         cnt = cnt - 1;
+			    		event.other.pp:hit();
 
-	         if (event.other.tag == "enemy") then
+			         	if(event.other.pp.HP == 0) then
+			         		data.gold = data.gold + 20;
+			         		data.enemyCount = data.enemyCount - 1;
+			         		print("Enemies: " ..data.enemyCount);
+			         		print("Gold: " ..data.gold);
+			         	end
+			         	
+			         	if(data.enemyCount == 0) then
+			            	roundEnd();
+			            end
 
-	    		event.other.pp:hit();
-
-	         	if(event.other.pp.HP == 0) then
-	         		data.gold = data.gold + 20;
-	         		data.enemyCount = data.enemyCount - 1;
-	         		print("Enemies: " ..data.enemyCount);
-	         		print("Gold: " ..data.gold);
-	         	end
-	         	
-	         	if(data.enemyCount == 0) then
-	            	roundEnd();
-	            end
-
-	         end
-	      end
-	    end
-	    p:addEventListener("collision", removeProjectile);
-	  end
+			         end
+			        end
+			      end
+			    end
+			    p:addEventListener("collision", removeProjectile);
+		end
 	end
 end
 
