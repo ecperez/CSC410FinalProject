@@ -82,7 +82,9 @@ function Enemy:shoot (interval)
   local function createShot(obj)
     local p = display.newSprite(gameSheet, sequenceData);
     p.x = obj.shape.x;
-    p.y = obj.shape.y+50;
+    if(obj.shape.y ~= nil)then
+        p.y = obj.shape.y+50;
+    end
     p.anchorY=0;
     p:setSequence("Laser Type 1 Red");
     physics.addBody(p, "dynamic", {filter=CollisionFilters.enemyBullet});
