@@ -59,8 +59,11 @@ sheetOpt =
 		---Lasers---Frames 49 to 50
 		{x = 835, y = 566, width = 13, height = 36}, --blue laser
 		{x = 843, y = 941, width = 13, height = 36}, --red laser
+		{x = 848, y = 738, width = 13, height = 36}, --green laser
 		---Bombs---Frame 51
-		{x = 580, y = 661, width = 48, height = 46}--red bomb
+		{x = 596, y = 961, width = 48, height = 46}, --blue bomb
+		{x = 580, y = 661, width = 48, height = 46}, --red bomb
+		{x = 192, y = 240, width = 48, height = 46} --green bomb
 	}
 }
 
@@ -111,8 +114,11 @@ sequenceData = {
 	---Laser Sequence---
 	{ name = "Laser Type 1 Blue", start=49, count=1, time=0, loopCount=1 },
 	{ name = "Laser Type 1 Red", start=50, count=1, time=0, loopCount=1 },
+	{ name = "Laser Type 1 Green", start=51, count=1, time=0, loopCount=1 },
 	---Bomb Sequence---
-	{ name = "Bomb Type 1 Red", start=51, count=1, time=0, loopCount=1 }
+	{ name = "Bomb Type 1 Blue", start=52, count=1, time=0, loopCount=1 },
+	{ name = "Bomb Type 1 Red", start=53, count=1, time=0, loopCount=1 },
+	{ name = "Bomb Type 1 Green", start=54, count=1, time=0, loopCount=1 }
 }
 
 --define the sprite sheet
